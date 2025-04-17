@@ -1,11 +1,15 @@
-import express, {Request, Response, NextFunction } from 'express';
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
 /*
        -- Routing --
 
 Routing refers to how an application's endpoints (URIs) respond to client requests.
 
-You define routing using methods of the Express app object that 
+You define routing using methods of the Express app object that
 correspond to HTTP methods — for example, `app.get()` to handle GET
 requests and `app.post()` to handle POST requests. You can also use
 `app.all()` to handle all HTTP methods and `app.use()` to specify
@@ -17,20 +21,20 @@ In fact, routing methods can have more than one callback function as arguments. 
 
         -- Route Paths --
 
-Route paths, in combination with a request mehtod, define the endpoints at which request can made. Route paths can cbe strings, 
+Route paths, in combination with a request mehtod, define the endpoints at which request can made. Route paths can cbe strings,
 string patterns, or regular expressions.
 
 
-Note --> 
-In Express 5, the charater ?, +, *, [], and () are handled 
-differently than in version 4, 
+Note -->
+In Express 5, the charater ?, +, *, [], and () are handled
+differently than in version 4,
 
-Note --> In Express 4, regular expression character such as $ need 
+Note --> In Express 4, regular expression character such as $ need
 to escaped with a \.
 
-Note --> Express uses path-to-regexp for matching the route paths; 
+Note --> Express uses path-to-regexp for matching the route paths;
 see the path-to-regexp documentation for all the possibilities in
-defning route paths. Express Playground Router is a handy tool for 
+defning route paths. Express Playground Router is a handy tool for
 testing basuc Express routes, although it does not support pattern
 matching.
 
@@ -48,69 +52,34 @@ Route path: /users/:userId/books/:bookId
 Request URL: http://localhost:3000/users/34/books/8989
 req.params: { "userId": "34", "bookId": "8989" }
 
-app.get('/users/:userId/books/:bookId', (req, res) => {
-  res.send(req.params)
-})
-
-Note --> The name of the route parameter must be made of
-"word characters" ([A-Za-z0-9]).
-
-Since the hypen (-) and the dot (.) are interpreted literally, they
-can be used aloong with route parameter for useful purposes.
-
-Route path: /flights/:from-:to
-Request URL: http://localhost:3000/flights/LAX-SFO
-req.params: { "from": "LAX", "to": "SFO" }
-
-Route path: /plantae/:genus.:species
-Request URL: http://localhost:3000/plantae/Prunus.persica
-req.params: { "genus": "Prunus", "species": "persica" }
-
-Note --> In Express 5, charater are not supported in the route paths,
-for more information you can visit the migration guide.
-
-
 
 */
-
-
-const app = express();
+const app = (0, express_1.default)();
 const PORT = 3000;
-
-app.use(express.json());
-
+app.use(express_1.default.json());
 //      --- Basic Routing ---
-
 // This route path will match request to the root route, /.
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req, res) => {
     res.send("Basic Route");
-})
-
-app.post('/', (req: Request, res: Response) => {
-    res.send("POST request to the homepage")
-})
-
+});
+app.post('/', (req, res) => {
+    res.send("POST request to the homepage");
+});
 // This route path will match request to /secret.
-app.all('/secret', (req: Request, res: Response, next: NextFunction) => {
+app.all('/secret', (req, res, next) => {
     console.log("Accessin the secret section...");
-    res.send("Secret section accessed")
+    res.send("Secret section accessed");
     next();
-})
-
+});
 // This route path will match request to /random.text.
-app.get("/random.text", (req: Request, res: Response) => {
+app.get("/random.text", (req, res) => {
     res.send('Random.text');
-})
-
-
+});
 //      --- Route Parameter ---
-
-app.get('/user/:userId/books/:bookId', (req: Request, res:Response) => {
+app.get('/user/:userId/books/:bookId', (req, res) => {
     console.log("Route Parameter");
     res.send(req.params);
-})
-
-
+});
 app.listen(PORT, () => {
-    console.log(`Server is listening on the port ${PORT}`)
-})
+    console.log(`Server is listening on the port ${PORT}`);
+});
