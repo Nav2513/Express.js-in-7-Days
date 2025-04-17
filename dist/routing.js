@@ -52,6 +52,38 @@ Route path: /users/:userId/books/:bookId
 Request URL: http://localhost:3000/users/34/books/8989
 req.params: { "userId": "34", "bookId": "8989" }
 
+app.get('/users/:userId/books/:bookId', (req, res) => {
+  res.send(req.params)
+})
+
+Note --> The name of the route parameter must be made of
+"word characters" ([A-Za-z0-9]).
+
+Since the hypen (-) and the dot (.) are interpreted literally, they
+can be used aloong with route parameter for useful purposes.
+
+Route path: /flights/:from-:to
+Request URL: http://localhost:3000/flights/LAX-SFO
+req.params: { "from": "LAX", "to": "SFO" }
+
+Route path: /plantae/:genus.:species
+Request URL: http://localhost:3000/plantae/Prunus.persica
+req.params: { "genus": "Prunus", "species": "persica" }
+
+Note --> In Express 5, charater are not supported in the route paths,
+for more information you can visit the migration guide.
+
+To have more control over the exact string that can be matched by a
+route parameter, you can append a regular expression.
+
+Route path: /user/:userId(\d+)
+Request URL: http://localhost:3000/user/42
+req.params: {"userId": "42"}
+
+Note -->  Because the regular expression is usally part if a string,
+be sure to escape any \ any character an aditional blaclslash,
+for example \\d+.
+
 
 */
 const app = (0, express_1.default)();
@@ -76,9 +108,19 @@ app.get("/random.text", (req, res) => {
     res.send('Random.text');
 });
 //      --- Route Parameter ---
+// Here appending the value of userId & bookId in the url.
 app.get('/user/:userId/books/:bookId', (req, res) => {
-    console.log("Route Parameter");
-    res.send(req.params);
+    const { userId, bookId } = req.params;
+    res.send(`userID: ${userId}, bookId: ${bookId}`);
+});
+// Here appending the value of from & to by using (-).
+app.get('/flights/:from-:to', (req, res) => {
+    const { from, to } = req.params;
+    res.send(`from: ${from}, to: ${to}`);
+});
+app.get('/plantae/:genus.:species', (req, res) => {
+    const { genus, species } = req.params;
+    res.send(`genus: ${genus}, species: ${species}`);
 });
 app.listen(PORT, () => {
     console.log(`Server is listening on the port ${PORT}`);
