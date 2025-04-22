@@ -275,9 +275,9 @@ app.route('/books')
     .put((req, res) => {
     res.send("Response from the app.route, put request");
 });
-//    --- express.Routes ---
+//    --- express.Routes() ---
 // thus code can be used in the ohter file for better 
-// understanding.
+// unde
 const birds = require('./experimental/birds');
 app.use('/', birds);
 app.listen(PORT, () => {
