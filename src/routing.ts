@@ -83,6 +83,76 @@ for example \\d+.
 
         ---Route handlers ---
 
+You can provide multiple callback functions that behave like
+middleware to handle a request. The only exception is that these callback might invoke next('route') to bypass the remainig route
+callbacks. You can use this mechanism to impose pre-condition
+on a route, then pass control to subsequent route if there's no 
+reason to proceed with the current route.
+
+Route handlers can be in the form of a function, array of functions,
+or combinations of both, as shown in the following examples.
+
+A single callback function can handle a route. For Example
+
+app.get('/example/a', (req, res) => {
+  res.send('Hello from A!')
+})
+
+More than one callback function can be handled a route(make sure 
+you specify the next object). for example
+
+app.get('/example/b', (req, res, next) => {
+  console.log('the response will be sent by the next function ...')
+  next()
+}, (req, res) => {
+  res.send('Hello from B!')
+})
+
+        ---Response mehtod ---
+
+The method on the response object(res) in the following table can 
+response to the client, and terminate the request-response cycle.
+If none of these methods are called from a route handler, 
+the client request will be left hanging.
+
+Mehtod              Description
+
+res.download()	    Prompt a file to be downloaded.
+res.end()	        End the response process.
+res.json()	        Send a JSON response.
+res.jsonp()	        Send a JSON response with JSONP support.
+res.redirect()	    Redirect a request.
+res.render()	    Render a view template.
+res.send()	        Send a response of various types.
+res.sendFile()	    Send a file as an octet stream.
+res.sendStatus()	Set the response status code and send 
+                    its string representation as the response body.
+
+
+        --- app.route() ---
+
+You can create chainable route for a route path by using app.route().
+Because th epath is specified at a signal location, creating modular
+routes is helpful, as is reducing redundancy and typos.
+
+Here is an example of chainned route hanlder that are defined by
+using app.route().
+
+app.route('/book')
+  .get((req, res) => {
+    res.send('Get a random book')
+  })
+  .post((req, res) => {
+    res.send('Add a book')
+  })
+  .put((req, res) => {
+    res.send('Update the book')
+  })
+
+        --- express.Router ---
+Use the express.Router class to create modular, mountable route
+handlers. A Router instanced is a complete middleware and routing sys
+
 
 */
 
@@ -132,11 +202,80 @@ app.get('/flights/:from-:to', (req: Request, res: Response) => {
     res.send(`from: ${from}, to: ${to}`);
 })
 
-
+// Here we are using the dot(.) to append in the url.
 app.get('/plantae/:genus.:species', (req: Request, res: Response) => {
     const {genus, species} = req.params;
     res.send(`genus: ${genus}, species: ${species}`);
 })
+
+
+
+// Here we implement more than one callback function or middleware function 
+// Request -> Middleware 1 -> Middleware 2 -> Response.
+app.get('/example/b', (req: Request, res: Response, next: NextFunction) =>{
+    console.log("The respone will be sent by the next function ...")
+    next();
+}, (req: Request, res: Response) => {
+    res.send("Hi from the second");
+})
+
+
+interface CustomResquest extends Request {
+    sum?: number;
+}
+
+const cb0 = function(req: CustomResquest, res: Response, next: NextFunction){
+    console.log("CB0");
+    const a = 10, b = 20;
+    req.sum = a+b;
+    next();
+}
+
+const cb1 = function(req: Request, res: Response, next: NextFunction){
+    console.log("CB1");
+    next();
+}
+
+const cb2 = function(req: CustomResquest, res: Response) {
+    console.log("CB2");
+    res.send(`the sum of two number is ${req.sum}`)
+}
+
+app.get("/example/c", [cb0, cb1, cb2])
+
+
+// A combination of independent function and arrays of functions can
+// handle a route.
+
+const cd0 = function(req: Request, res: Response, next: NextFunction) {
+    console.log("CD0");
+    next();
+}
+const cd1 = function(req: Request, res: Response, next: NextFunction) {
+    console.log("CD1");
+    next();
+}
+
+app.get('/example/d', [cd0, cd1], (req: Request, res: Response, next: NextFunction) => {
+    console.log("This response is sent by the next");
+    next();
+}, (req: Request, res: Response) => {
+    res.send("Combination of the idependent function");
+})
+
+
+// Here we are creating the chainable route handlers using app.route.
+app.route('/books')
+    .get((req: Request, res: Response) => {
+        res.send("Response from the app.route, get request");
+    })
+    .post((req: Request, res: Response) => {
+        res.send("Response from the app.route, post request");
+    })
+    .put((req: Request, res: Response) => {
+        res.send("Response from the app.route, put request");
+    })
+
 
 
 app.listen(PORT, () => {
